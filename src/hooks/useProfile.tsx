@@ -59,7 +59,7 @@ export function useProfile() {
                 setProfile(mapProfile(data));
             }
         } catch (error: any) {
-            console.error('Error fetching profile:', error);
+            console.error('Error fetching profile:', error.message ?? error, error.code ?? '');
             toast.error('Failed to load profile');
         } finally {
             setLoading(false);

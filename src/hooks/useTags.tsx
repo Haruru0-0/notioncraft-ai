@@ -54,7 +54,7 @@ export function useTags() {
       setTags(tagsResult.data || []);
       setPageTags(pageTagsResult.data || []);
     } catch (error: any) {
-      console.error('Error fetching tags:', error);
+      console.error('Error fetching tags:', error.message ?? error, error.code ?? '');
       toast.error('Failed to load tags');
     } finally {
       setLoading(false);

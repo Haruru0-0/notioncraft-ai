@@ -1,5 +1,5 @@
 "use client";
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -105,11 +105,12 @@ function AuthContent() {
   // A password recovery callback arrives as ?type=recovery
   const isRecoveryMode = searchParams.get('type') === 'recovery' && !recoveryDone;
 
-  // Redirect if already logged in (unless in recovery mode)
-  if (user && !isRecoveryMode) {
-    router.push('/');
-    return null;
-  }
+  // Redirect if already logged in (unless in recovery mode). Navigating during render is not allowed.
+  const signedIn = !!user && !isRecoveryMode;
+  useEffect(() => {
+    if (signedIn) router.push('/');
+  }, [signedIn, router]);
+  if (signedIn) return null;
 
   const clear = (key: keyof FieldErrors) => setErrors(prev => ({ ...prev, [key]: undefined }));
 

@@ -48,7 +48,7 @@ export function usePages() {
       setPages(activePages);
       setTrash(archivedPages);
     } catch (error: any) {
-      console.error('Error fetching pages:', error);
+      console.error('Error fetching pages:', error.message ?? error, error.code ?? '');
       toast.error('Failed to load pages');
     } finally {
       setLoading(false);
