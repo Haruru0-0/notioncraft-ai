@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Smile } from 'lucide-react';
+import { PageIcon, PAGE_ICON_KEYS, pageIconValue } from './PageIcon';
 import { Page } from '@/hooks/usePages';
 import { Button } from '@/components/ui/button';
 import { PageTags } from './PageTags';
@@ -13,8 +13,6 @@ interface PageHeaderProps {
   page: Page;
   onUpdatePage: (id: string, updates: Partial<Page>) => void;
 }
-
-const commonEmojis = ['📄', '📝', '📋', '📌', '⭐', '🎯', '💡', '🔥', '✨', '🚀', '📊', '📈', '🏠', '💻', '🎨', '📚', '🎵', '🎮', '💼', '🔧'];
 
 export function PageHeader({ page, onUpdatePage }: PageHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -49,8 +47,8 @@ export function PageHeader({ page, onUpdatePage }: PageHeaderProps) {
     }
   };
 
-  const handleIconSelect = (emoji: string) => {
-    onUpdatePage(page.id, { icon: emoji });
+  const handleIconSelect = (icon: string) => {
+    onUpdatePage(page.id, { icon });
   };
 
   return (
@@ -61,20 +59,22 @@ export function PageHeader({ page, onUpdatePage }: PageHeaderProps) {
             <Button
               variant="ghost"
               className="h-auto p-2 text-4xl hover:bg-muted"
+              aria-label="Change page icon"
             >
-              {page.icon || '📄'}
+              <PageIcon icon={page.icon} className="size-9" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64" align="start">
             <div className="grid grid-cols-5 gap-1">
-              {commonEmojis.map((emoji) => (
+              {PAGE_ICON_KEYS.map((key) => (
                 <Button
-                  key={emoji}
+                  key={key}
                   variant="ghost"
-                  className="h-10 w-10 p-0 text-xl hover:bg-muted"
-                  onClick={() => handleIconSelect(emoji)}
+                  className="h-10 w-10 p-0 hover:bg-muted"
+                  aria-label={key}
+                  onClick={() => handleIconSelect(pageIconValue(key))}
                 >
-                  {emoji}
+                  <PageIcon icon={pageIconValue(key)} className="size-5" />
                 </Button>
               ))}
             </div>

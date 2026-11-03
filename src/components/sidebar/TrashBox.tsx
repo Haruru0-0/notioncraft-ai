@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Page } from '@/hooks/usePages';
-import { Trash2, RotateCcw, X, Search, FileText } from 'lucide-react';
+import { Trash2, RotateCcw, X, Search } from 'lucide-react';
+import { PageIcon } from '@/components/PageIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -67,7 +68,7 @@ export function TrashBox({ trash, onRestore, onDeleteForever }: TrashBoxProps) {
                                 >
                                     <div className="flex items-center gap-2 overflow-hidden">
                                         <div className="flex h-5 w-5 items-center justify-center rounded border bg-background">
-                                            {page.icon ? <span className='text-xs'>{page.icon}</span> : <FileText className="h-3 w-3 text-muted-foreground" />}
+                                            <PageIcon icon={page.icon} className="h-3 w-3 text-muted-foreground" />
                                         </div>
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-sm truncate text-foreground">{page.title || 'Untitled'}</span>

@@ -10,8 +10,11 @@ import { AppSidebar } from '@/components/sidebar/AppSidebar';
 import { NotionEditor } from '@/components/editor/NotionEditor';
 import { PageHeader } from '@/components/PageHeader';
 import { AIChatSidebar } from '@/components/ai/AIChatSidebar';
+import { insertAiText } from '@/lib/ai-edit';
 import { Button } from '@/components/ui/button';
-import { Sparkles, FileText, Loader2, ListTree } from 'lucide-react';
+import { Sparkles, Loader2, ListTree } from 'lucide-react';
+import Mark from '@/components/landing/Mark';
+import { wood } from '../forme-fonts';
 import { TableOfContents, ToCItem } from '@/components/editor/components/TableOfContents';
 import type { Editor } from '@tiptap/react';
 import {
@@ -127,7 +130,11 @@ export default function Workspace() {
   };
 
   const handleDeletePage = async (pageId: string) => {
-    await deletePage(pageId);
+    const deleted = pages.find(p => p.id === pageId);
+    const moved = await deletePage(pageId);
+    if (moved) toast('Moved to trash', {
+      action: deleted ? { label: 'Undo', onClick: () => restorePage(pageId, { ...deleted, is_archived: false }) } : undefined,
+    });
     if (activePageId === pageId) {
       const remainingRootPages = getChildPages(null);
       if (remainingRootPages.length > 0) {
@@ -153,10 +160,9 @@ export default function Workspace() {
   };
 
   const handleInsertContent = (content: string) => {
-    // This will be passed to the editor to insert AI-generated content
+    // Inserted as a suggestion: marked until the writer accepts or rejects it
     if (editorRef.current) {
-      editorRef.current.commands.focus();
-      editorRef.current.commands.insertContent(content);
+      insertAiText(editorRef.current, content);
     }
   };
 
@@ -175,7 +181,7 @@ export default function Workspace() {
 
   return (
     <SidebarProvider>
-      <div className="h-screen overflow-hidden flex w-full">
+      <div className={cn('h-screen overflow-hidden flex w-full', wood.variable)}>
         <AppSidebar
           pages={pages}
           currentPageId={activePageId}
@@ -244,13 +250,17 @@ export default function Workspace() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                  <FileText className="h-16 w-16 text-muted-foreground/30 mb-4" />
-                  <h2 className="text-xl font-semibold mb-2">No page selected</h2>
+                  <Mark inverted className="h-12 w-12 mb-6" />
+                  <h2 className="text-3xl sm:text-4xl mb-3" style={{ fontFamily: 'var(--font-wood), serif' }}>
+                    {rootPages.length === 0 ? 'Start your first page' : 'Pick a page to write in'}
+                  </h2>
                   <p className="text-muted-foreground mb-6 max-w-md">
-                    Create your first page to start writing. Use the sidebar to manage your pages.
+                    {rootPages.length === 0
+                      ? 'Write anything. Select a passage and the Assistant button will improve, shorten or expand it, and mark the change until you accept it.'
+                      : 'Choose a page in the sidebar, or start a new one.'}
                   </p>
                   <Button onClick={() => handleCreatePage(null)}>
-                    Create your first page
+                    New page
                   </Button>
                 </div>
               )}

@@ -3,6 +3,7 @@ import { ChevronRight, ChevronDown, Plus, MoreHorizontal, Trash2, Copy, Star } f
 import { cn } from '@/lib/utils';
 import { Page } from '@/hooks/usePages';
 import { Button } from '@/components/ui/button';
+import { PageIcon } from '@/components/PageIcon';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,7 +94,7 @@ function PageItem({
           className="flex-1 flex items-center gap-2 min-w-0"
           onClick={() => onSelectPage(page.id)}
         >
-          <span className="text-base">{page.icon || '📄'}</span>
+          <PageIcon icon={page.icon} className="h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="text-sm truncate text-sidebar-foreground">
             {page.title || 'Untitled'}
           </span>

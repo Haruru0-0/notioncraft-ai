@@ -119,13 +119,15 @@ export function usePages() {
         setPages(prev => prev.filter(page => page.id !== id));
         setTrash(prev => [{ ...pageToDelete, is_archived: true }, ...prev]);
       }
+      return true;
     } catch (error: any) {
       console.error('Error deleting page:', error);
       toast.error('Failed to delete page');
+      return false;
     }
   };
 
-  const restorePage = async (id: string) => {
+  const restorePage = async (id: string, fallback?: Page) => {
     try {
       const { error } = await supabase
         .from('pages')
@@ -134,7 +136,7 @@ export function usePages() {
 
       if (error) throw error;
 
-      const pageToRestore = trash.find(p => p.id === id);
+      const pageToRestore = trash.find(p => p.id === id) ?? fallback;
       if (pageToRestore) {
         setTrash(prev => prev.filter(page => page.id !== id));
         setPages(prev => [...prev, { ...pageToRestore, is_archived: false }]);
