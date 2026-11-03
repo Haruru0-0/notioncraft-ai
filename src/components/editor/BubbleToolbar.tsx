@@ -18,6 +18,7 @@ import {
   Palette,
   Unlink,
   Type,
+  PenLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +31,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { AI_EDIT_ACTIONS, type AiEditType } from '@/lib/ai-edit';
 
 interface BubbleToolbarProps {
   editor: Editor;
+  onAiEdit?: (type: AiEditType) => void;
+  aiBusy?: boolean;
 }
 
 const HIGHLIGHT_COLORS = [
@@ -72,12 +76,13 @@ const FONT_SIZES = [
   { name: 'XXL', value: '32px' },
 ];
 
-export function BubbleToolbar({ editor }: BubbleToolbarProps) {
+export function BubbleToolbar({ editor, onAiEdit, aiBusy = false }: BubbleToolbarProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [linkUrl, setLinkUrl] = useState('');
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [fontFamilyOpen, setFontFamilyOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [fontSizeOpen, setFontSizeOpen] = useState(false);
   const [highlightOpen, setHighlightOpen] = useState(false);
   const [textColorOpen, setTextColorOpen] = useState(false);
@@ -249,6 +254,43 @@ export function BubbleToolbar({ editor }: BubbleToolbarProps) {
         maxWidth: 'calc(100vw - 20px)',
       }}
     >
+      {/* Assistant: rewrites the selection in place, marked until accepted */}
+      {onAiEdit && (
+        <Popover open={aiOpen} onOpenChange={setAiOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs"
+              disabled={aiBusy}
+              onMouseDown={(e) => e.preventDefault()}
+              title="Ask the assistant to rewrite the selected text"
+            >
+              <PenLine className="h-4 w-4 mr-1" />
+              Assistant
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72 p-1" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+            {AI_EDIT_ACTIONS.map((action) => (
+              <Button
+                key={action.type}
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between text-xs"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setAiOpen(false);
+                  onAiEdit(action.type);
+                }}
+              >
+                {action.label}
+                <span className="text-muted-foreground">{action.hint}</span>
+              </Button>
+            ))}
+          </PopoverContent>
+        </Popover>
+      )}
+
       {/* Font selectors */}
       <Popover open={fontFamilyOpen} onOpenChange={setFontFamilyOpen}>
         <PopoverTrigger asChild>

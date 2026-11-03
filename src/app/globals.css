@@ -141,7 +141,7 @@
 }
 
 .ProseMirror [data-id] {
-  border: 3px solid #0d0d0d;
+  border: 3px solid var(--foreground);
   border-radius: 0.5rem;
   margin: 1rem 0;
   position: relative;
@@ -151,12 +151,12 @@
 
 .ProseMirror [data-id]::before {
   content: attr(data-id);
-  background-color: #0d0d0d;
+  background-color: var(--foreground);
   font-size: 0.6rem;
   letter-spacing: 1px;
   font-weight: bold;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--background);
   position: absolute;
   top: 0;
   padding: 0.25rem 0.75rem;
@@ -519,6 +519,21 @@
 .slash-command-item-description {
   font-size: 0.75rem;
   color: var(--muted-foreground);
+}
+
+/* Text the assistant wrote: one rubine ink, until accepted or rejected */
+:root {
+  --ai-ink: #d6244a;
+  --ai-ink-foreground: #ffffff;
+}
+
+.tiptap .ai-suggestion {
+  background: var(--ai-ink);
+  color: var(--ai-ink-foreground);
+  border-radius: 2px;
+  padding: 0 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* AI inline content styling */

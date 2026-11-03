@@ -34,6 +34,10 @@ import { MathBlock, MathInline } from './extensions/MathExtension';
 import { DataTable } from './extensions/DataTableExtension';
 import { FontSize } from './extensions/FontSizeExtension';
 import { LinkDialog } from './modals/LinkDialog';
+import { AiSuggestion } from './extensions/AiSuggestionExtension';
+import { AiSuggestionBar } from './AiSuggestionBar';
+import { requestAiEdit, type AiEditType } from '@/lib/ai-edit';
+import { toast } from 'sonner';
 
 const lowlight = createLowlight(common);
 
@@ -60,7 +64,7 @@ export const NotionEditor = forwardRef<any, NotionEditorProps>(({ content, onUpd
         codeBlock: false,
       }),
       Dropcursor.configure({
-        color: '#3b82f6',
+        color: 'var(--primary)',
         width: 4,
         class: 'drop-cursor-line',
       }),
@@ -135,6 +139,7 @@ export const NotionEditor = forwardRef<any, NotionEditorProps>(({ content, onUpd
       MathBlock,
       MathInline,
       DataTable,
+      AiSuggestion,
       SlashCommands,
     ],
     content: content?.content || '',
@@ -164,6 +169,20 @@ export const NotionEditor = forwardRef<any, NotionEditorProps>(({ content, onUpd
       }, 500);
     },
   });
+
+  const [aiBusy, setAiBusy] = useState(false);
+
+  const runAiEdit = async (type: AiEditType) => {
+    if (!editor || aiBusy) return;
+    setAiBusy(true);
+    try {
+      await requestAiEdit(editor, type);
+    } catch (error) {
+      toast.error('Assistant', { description: error instanceof Error ? error.message : 'Something went wrong. Try again.' });
+    } finally {
+      setAiBusy(false);
+    }
+  };
 
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogConfig, setLinkDialogConfig] = useState<{
@@ -217,10 +236,11 @@ export const NotionEditor = forwardRef<any, NotionEditorProps>(({ content, onUpd
 
   return (
     <div className="relative">
-      <BubbleToolbar editor={editor} />
+      <BubbleToolbar editor={editor} onAiEdit={runAiEdit} aiBusy={aiBusy} />
       <TableBubbleMenu editor={editor} />
       <ContentItemMenu editor={editor} />
       <EditorContent editor={editor} />
+      <AiSuggestionBar editor={editor} busy={aiBusy} />
 
       <LinkDialog
         open={linkDialogOpen}

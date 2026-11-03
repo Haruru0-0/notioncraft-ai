@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Sparkles, User, Loader2 } from 'lucide-react';
+import { X, Send, User, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -112,7 +112,6 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
       <ScrollArea className="flex-1 p-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
             <h4 className="font-medium mb-2">AI Assistant</h4>
             <p className="text-sm text-muted-foreground">
               Ask me anything! I can help you write, brainstorm ideas, or answer questions.
@@ -129,8 +128,8 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
                 )}
               >
                 {message.role === 'assistant' && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="h-4 w-4 text-primary" />
+                  <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center" aria-hidden>
+                    <span className="h-3 w-3 rounded-[2px] bg-[var(--ai-ink)]" />
                   </div>
                 )}
                 <div
@@ -202,7 +201,7 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
       <div className="w-80 border-l bg-background flex flex-col h-full overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <span aria-hidden className="h-3 w-3 rounded-[2px] bg-[var(--ai-ink)]" />
             <h3 className="font-semibold">AI Assistant</h3>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -220,7 +219,7 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="flex flex-row items-center justify-between">
           <DrawerTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <span aria-hidden className="h-3 w-3 rounded-[2px] bg-[var(--ai-ink)]" />
             AI Assistant
           </DrawerTitle>
           <DrawerClose asChild>
