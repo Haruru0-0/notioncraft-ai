@@ -1,243 +1,143 @@
 "use client";
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Layers, Zap } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import LineWaves from '@/components/LineWaves';
-import TiltedCard from '@/components/TiltedCard';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Alfa_Slab_One, Schibsted_Grotesk } from "next/font/google";
+import { useAuth } from "@/hooks/useAuth";
+import Forme from "@/components/landing/Forme";
+import "./forme.css";
 
-gsap.registerPlugin(useGSAP);
+const wood = Alfa_Slab_One({ weight: "400", subsets: ["latin"], variable: "--font-wood", display: "swap" });
+const grotesk = Schibsted_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap" });
 
-const Index = () => {
+const IN_THE_EDITOR = [
+  {
+    title: "Blocks you can move",
+    body: "Drag any paragraph, list, table or code block to a new place on the page.",
+  },
+  {
+    title: "Pages inside pages",
+    body: "Nest pages, mark favourites, add tags, and restore anything from the trash.",
+  },
+  {
+    title: "Code and maths",
+    body: "Syntax-highlighted code blocks and KaTeX equations sit in the text like any other block.",
+  },
+  {
+    title: "An outline that builds itself",
+    body: "Headings become a table of contents beside the page, so long notes stay navigable.",
+  },
+];
+
+/** A type slug: a block of metal type with the letter N cut out of it. */
+function Mark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" role="img" aria-label="NotionCraft" className={className}>
+      <rect x="1" y="1" width="30" height="30" rx="2" fill="#f7f7f2" />
+      <path d="M9 24V8h3.2l7.6 10.4V8H23v16h-3.2L12.2 13.6V24z" fill="#1d36c9" />
+    </svg>
+  );
+}
+
+export default function Index() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!loading && user) {
-      router.push('/workspace');
-    }
+    if (!loading && user) router.push("/workspace");
   }, [user, loading, router]);
-
-  useGSAP(
-    () => {
-      if (loading) return;
-
-      gsap
-        .timeline({ defaults: { ease: 'power3.out' } })
-        .from('.gsap-bg', { opacity: 0, duration: 1.2 })
-        .from('.gsap-logo', { opacity: 0, x: -16, duration: 0.6 }, 0.2)
-        .from('.gsap-nav-actions', { opacity: 0, x: 16, duration: 0.6 }, '<')
-        .from('.gsap-badge', { opacity: 0, y: 16, duration: 0.6 }, '-=0.3')
-        .from('.gsap-heading', { opacity: 0, y: 32, duration: 0.7 }, '-=0.3')
-        .from('.gsap-subtitle', { opacity: 0, y: 24, duration: 0.6 }, '-=0.4')
-        .from('.gsap-cta', { opacity: 0, y: 24, duration: 0.6 }, '-=0.4')
-        .from('.gsap-scroll', { opacity: 0, duration: 0.8 }, '-=0.3')
-        .from(
-          '.gsap-feature-card',
-          { opacity: 0, y: 32, duration: 0.6, stagger: 0.15 },
-          '-=0.3'
-        );
-    },
-    { scope: containerRef, dependencies: [loading] }
-  );
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className={`forme ${wood.variable} ${grotesk.variable} forme-body flex items-center justify-center`}>
+        <p role="status">Loading</p>
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen overflow-hidden">
-      {/* Animated background */}
-      <div className="gsap-bg fixed inset-0">
-        <LineWaves
-          color1="#666666"
-          color2="#666666"
-          color3="#666666"
-          brightness={0.4}
-          speed={0.2}
-          enableMouseInteraction
-          mouseInfluence={2}
-        />
-      </div>
-
-      {/* Header - Responsive */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 py-3 sm:py-4 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="gsap-logo flex items-center gap-2 sm:gap-3">
-            <Image
-              src="/Notion-black.png"
-              alt="NotionCraft"
-              width={40}
-              height={40}
-              className="h-8 w-8 sm:h-10 sm:w-10 dark:hidden"
-            />
-            <Image
-              src="/Notion-white.png"
-              alt="NotionCraft"
-              width={40}
-              height={40}
-              className="h-8 w-8 sm:h-10 sm:w-10 hidden dark:block"
-            />
-            <span className="text-lg sm:text-xl font-semibold hidden sm:inline">NotionCraft AI</span>
-          </div>
-          <div className="gsap-nav-actions flex items-center gap-1 sm:gap-3">
-            <ThemeToggle />
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex cursor-pointer" onClick={() => router.push('/auth')}>
-              Sign In
-            </Button>
-            <Button size="sm" onClick={() => router.push('/auth')} className="gap-1 sm:gap-2 text-sm sm:text-base cursor-pointer">
-              <span className="hidden sm:inline">Get Started</span>
-              <span className="sm:hidden">Start</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
-            </Button>
-          </div>
+    <div className={`forme ${wood.variable} ${grotesk.variable} forme-body`}>
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-3">
+          <Mark className="h-9 w-9" />
+          <span className="hidden text-lg font-semibold sm:inline">NotionCraft AI</span>
+        </Link>
+        <nav className="flex items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            onClick={() => router.push("/auth")}
+            className="hidden px-3 py-2 text-base underline-offset-4 hover:underline sm:inline-block"
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/auth")}
+            className="rounded-sm bg-[var(--forme-type)] px-4 py-2 text-base font-semibold text-[var(--forme-iron)] hover:bg-white"
+          >
+            Start writing
+          </button>
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 pt-20">
-        <div className="max-w-4xl mx-auto text-center">
-
-          {/* Main heading */}
-          <h1 className="gsap-heading text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6">
-            Write, plan, and
-            <br />
-            <span className="bg-linear-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
-              organize together
-            </span>
+      <main>
+        <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-16">
+          <h1 className="forme-display max-w-4xl text-[2.75rem] sm:text-6xl lg:text-[5.5rem]">
+            The assistant writes in the page, not in a chat tab.
           </h1>
-
-          {/* Subtitle */}
-          <p className="gsap-subtitle text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10">
-            A beautiful, minimal workspace for your notes and ideas.
-            Powered by AI to help you write faster and think clearer.
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--forme-type-dim)]">
+            NotionCraft AI is a block editor where you can ask for a summary, a checklist or a
+            tighter sentence, and it sets the line right where you are working. You accept it or
+            strike it.
           </p>
-
-          {/* CTA Buttons */}
-          <div className="gsap-cta flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
-            <Button
-              size="lg"
-              onClick={() => router.push('/auth')}
-              className="gap-2 cursor-pointer text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-lg hover:shadow-xl transition-shadow w-full sm:w-auto"
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => router.push("/auth")}
+              className="rounded-sm bg-[var(--forme-type)] px-6 py-3 text-lg font-semibold text-[var(--forme-iron)] hover:bg-white"
             >
-              Start for Free <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => router.push('/auth')}
-              className="text-base cursor-pointer sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto"
+              Start writing
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/auth")}
+              className="rounded-sm border border-[var(--forme-type-dim)] px-6 py-3 text-lg font-semibold hover:bg-white/10"
             >
-              Sign In
-            </Button>
+              Sign in
+            </button>
           </div>
 
-          {/* Scroll indicator - positioned between CTA and features */}
-          <div className="gsap-scroll flex flex-col items-center gap-2 text-muted-foreground text-sm mb-8 sm:mb-12">
-            <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex items-start justify-center p-1">
-              <div className="w-1.5 h-2.5 bg-muted-foreground/50 rounded-full animate-bounce" />
-            </div>
-            <span>Scroll to explore</span>
+          <div className="mt-12 max-w-4xl">
+            <Forme />
           </div>
+        </section>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto pb-8">
-            <FeatureCard
-              icon={<FileText className="h-5 w-5" />}
-              title="Rich Text Editor"
-              description="Tables, code blocks, math equations, and callout boxes"
-            />
-            <FeatureCard
-              icon={<Layers className="h-5 w-5" />}
-              title="Nested Pages"
-              description="Organize with favorites, tags, and infinite hierarchy"
-            />
-            <FeatureCard
-              icon={<Zap className="h-5 w-5" />}
-              title="AI Assistant"
-              description="Get help writing, editing, and brainstorming ideas"
-            />
-          </div>
-        </div>
-
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6" aria-labelledby="in-the-editor">
+          <h2 id="in-the-editor" className="forme-display text-3xl sm:text-5xl">
+            What is in the editor
+          </h2>
+          <dl className="mt-8 grid max-w-4xl gap-x-12 gap-y-8 sm:grid-cols-2">
+            {IN_THE_EDITOR.map((item) => (
+              <div key={item.title}>
+                <dt className="text-xl font-semibold">{item.title}</dt>
+                <dd className="mt-1 max-w-sm text-[var(--forme-type-dim)] leading-relaxed">{item.body}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/Notion-black.png"
-              alt="NotionCraft"
-              width={24}
-              height={24}
-              className="h-6 w-6 dark:hidden"
-            />
-            <Image
-              src="/Notion-white.png"
-              alt="NotionCraft"
-              width={24}
-              height={24}
-              className="h-6 w-6 hidden dark:block"
-            />
-            <span className="text-sm font-semibold">NotionCraft AI</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} NotionCraft AI. All rights reserved.
-          </p>
-        </div>
+      <footer className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
+        <p className="text-sm text-[var(--forme-type-dim)]">
+          Built by Ahmad Kanaan. Next.js, Tiptap and Supabase.{" "}
+          <a
+            className="underline underline-offset-4 hover:text-white"
+            href="https://github.com/Haruru0-0/notioncraft-ai"
+          >
+            Source on GitHub
+          </a>
+        </p>
       </footer>
     </div>
   );
-};
-
-const TRANSPARENT_PIXEL =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUAAarVyFEAAAAASUVORK5CYII=';
-
-function FeatureCard({
-  icon,
-  title,
-  description
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="gsap-feature-card">
-      <TiltedCard
-        imageSrc={TRANSPARENT_PIXEL}
-        containerHeight="220px"
-        containerWidth="100%"
-        imageHeight="220px"
-        imageWidth="100%"
-        scaleOnHover={1.05}
-        rotateAmplitude={12}
-        showMobileWarning={false}
-        showTooltip={false}
-        displayOverlayContent
-        overlayContent={
-          <div className="group p-6 rounded-2xl bg-card border border-border hover:border-primary/20 hover:shadow-lg transition-all duration-300 w-full h-55 text-left">
-            <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-              {icon}
-            </div>
-            <h3 className="font-semibold mb-2">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
-          </div>
-        }
-      />
-    </div>
-  );
 }
-
-export default Index;

@@ -203,6 +203,7 @@ export default function Workspace() {
                   setIsAISidebarOpen(!isAISidebarOpen);
                   pulseButton(aiButtonRef.current);
                 }}
+                aria-pressed={isAISidebarOpen}
                 className={cn("gap-2", isAISidebarOpen && "bg-accent")}
               >
                 <Sparkles className="h-4 w-4" />
@@ -216,6 +217,7 @@ export default function Workspace() {
                   setIsToCOpen(!isToCOpen);
                   pulseButton(tocButtonRef.current);
                 }}
+                aria-pressed={isToCOpen}
                 className={cn("gap-2", isToCOpen && "bg-accent")}
               >
                 <ListTree className="h-4 w-4" />
@@ -227,7 +229,7 @@ export default function Workspace() {
           <div className="flex-1 flex overflow-hidden">
             <div ref={contentRef} className="flex-1 overflow-y-auto">
               {currentPage ? (
-                <div className="max-w-3xl mx-auto px-10 sm:px-4 md:px-0">
+                <div className="max-w-3xl mx-auto px-4 md:px-0">
                   <PageHeader page={currentPage} onUpdatePage={updatePage} />
                   <NotionEditor
                     ref={(instance: Editor | null) => {
