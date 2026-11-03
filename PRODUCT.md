@@ -15,7 +15,7 @@ Inside the app, the user is someone writing and organizing notes who wants an AI
 A Notion-style note-taking workspace with an AI writing assistant. Users write in a block editor, organize pages in a tree, and ask the assistant to draft or rework content. Success means a visitor understands within seconds that the AI works inside the editor, and sees evidence that the app is real and well built.
 
 ## Positioning
-AI inside the block editor: the assistant writes into the page, not in a separate chat tab. (Confirmed by the author; the landing page should show this, not claim it.)
+AI inside the block editor: select text and the assistant rewrites it in place (improve, shorter, longer, grammar, professional tone). The result stays marked until the writer accepts or rejects it, and rejecting restores the original. A chat panel for questions also exists. (Confirmed by the author; the landing page should show this, not claim more than the app does.)
 
 ## Operating Context
 Public site at notioncraft-ai.vercel.app. Visitors arrive on the landing page, sign in or sign up (Supabase auth), then work in /workspace: a collapsible sidebar with search, favourites and a page tree, a centred editor column, an outline panel and an AI chat sidebar. Light and dark themes.

@@ -20,7 +20,7 @@ A letterpress forme: notes are blocks of type locked in an iron chase, and the a
 ## Components
 - No cards. The chase is the only enclosure on the page.
 - Buttons: off-white fill with iron text (primary) or a 1px dim-type outline (secondary); square 2px corners.
-- Assistant states are marks, not hues: `[ ]` brackets while pending, a struck line when rejected, a lock icon when accepted.
+- Assistant states are marks, not hues: `[ ]` brackets while pending and a lock icon once accepted. Rejecting puts the original text back, as the editor does. In the app, pending assistant text is a rubine highlight (`--ai-ink`) with an Accept/Reject bar.
 - Focus: 2px off-white outline, 3px offset.
 
 ## Motion

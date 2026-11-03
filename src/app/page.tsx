@@ -71,12 +71,12 @@ export default function Index() {
       <main>
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pt-16">
           <h1 className="forme-display max-w-4xl text-[2.75rem] sm:text-6xl lg:text-[5.5rem]">
-            The assistant writes in the page, not in a chat tab.
+            The assistant rewrites right in the page.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--forme-type-dim)]">
-            NotionCraft AI is a block editor where you can ask for a summary, a checklist or a
-            tighter sentence, and it sets the line right where you are working. You accept it or
-            strike it.
+            NotionCraft AI is a block editor with an assistant built in. Select any text and ask it
+            to improve, shorten, expand or fix it. The new version shows in red until you accept
+            it or put your own words back.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <button
