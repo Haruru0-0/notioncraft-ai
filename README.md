@@ -81,16 +81,11 @@ An intelligent note-taking and document management application that combines the
    ```
 
 3. **Set up environment variables**
-   Create a `.env.local` file in the root directory:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   
-   GOOGLE_API_KEY=your_google_ai_api_key
-   
-   DATABASE_URL=your_postgres_connection_string
+   Copy `.env.example` to `.env.local` and fill in the values:
+   ```bash
+   cp .env.example .env.local
    ```
+   The Supabase publishable key is read under two names, so set both.
 
 4. **Set up the database**
    ```bash
