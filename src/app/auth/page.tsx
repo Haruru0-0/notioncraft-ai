@@ -69,17 +69,17 @@ function Submit({ loading, idle, busy }: { loading: boolean; idle: string; busy:
 
 function Shell({ title, intro, children }: { title: string; intro?: string; children: React.ReactNode }) {
   return (
-    <div className={`forme ${wood.variable} ${grotesk.variable} forme-body`}>
-      <header className="mx-auto flex max-w-6xl items-center px-4 py-4 sm:px-6">
+    <div className={`forme ${wood.variable} ${grotesk.variable} forme-body flex flex-col`}>
+      <header className="mx-auto flex w-full max-w-6xl items-center px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-3" aria-label="NotionCraft AI, back to the home page">
           <Mark className="h-9 w-9" />
           <span className="text-lg font-semibold">NotionCraft AI</span>
         </Link>
       </header>
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pt-12">
-        <h1 className="forme-display max-w-2xl text-4xl sm:text-5xl lg:text-6xl">{title}</h1>
-        {intro && <p className="mt-4 max-w-md text-lg leading-relaxed text-[var(--forme-type-dim)]">{intro}</p>}
-        <div className="forme-chase mt-8 max-w-md">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 pb-16 pt-4 sm:px-6">
+        <h1 className="forme-display text-center text-4xl sm:text-5xl">{title}</h1>
+        {intro && <p className="mt-4 text-center text-lg leading-relaxed text-[var(--forme-type-dim)]">{intro}</p>}
+        <div className="forme-chase mt-8">
           <div className="forme-bed px-4 py-5 sm:px-6 sm:py-7">{children}</div>
         </div>
       </main>
