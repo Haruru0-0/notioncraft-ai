@@ -1,79 +1,109 @@
 "use client";
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2, Mail, KeyRound, Home } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import Mark from '@/components/landing/Mark';
+import { wood, grotesk } from '../forme-fonts';
+import '../forme.css';
 
-gsap.registerPlugin(useGSAP);
+const emailSchema = z.string().email('Enter a valid email address, like name@example.com');
+const passwordSchema = z.string().min(6, 'Use at least 6 characters');
 
-const emailSchema = z.string().email('Please enter a valid email address');
-const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
+type FieldErrors = { email?: string; password?: string; confirmPassword?: string };
+
+function Field({
+  id,
+  label,
+  error,
+  hint,
+  ...input
+}: {
+  id: string;
+  label: string;
+  error?: string;
+  hint?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>) {
+  const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-base font-medium">
+        {label}
+      </label>
+      <input
+        id={id}
+        className="forme-input"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        {...input}
+      />
+      {error ? (
+        <p id={`${id}-error`} className="mt-1.5 flex items-start gap-1.5 text-sm">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-sm text-[var(--forme-type-dim)]">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function Submit({ loading, idle, busy }: { loading: boolean; idle: string; busy: string }) {
+  return (
+    <button
+      type="submit"
+      disabled={loading}
+      className="flex w-full items-center justify-center gap-2 rounded-sm bg-[var(--forme-type)] px-4 py-3 text-lg font-semibold text-[var(--forme-iron)] hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {loading && <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden />}
+      {loading ? busy : idle}
+    </button>
+  );
+}
+
+function Shell({ title, intro, children }: { title: string; intro?: string; children: React.ReactNode }) {
+  return (
+    <div className={`forme ${wood.variable} ${grotesk.variable} forme-body`}>
+      <header className="mx-auto flex max-w-6xl items-center px-4 py-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-3" aria-label="NotionCraft AI, back to the home page">
+          <Mark className="h-9 w-9" />
+          <span className="text-lg font-semibold">NotionCraft AI</span>
+        </Link>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pt-12">
+        <h1 className="forme-display max-w-2xl text-4xl sm:text-5xl lg:text-6xl">{title}</h1>
+        {intro && <p className="mt-4 max-w-md text-lg leading-relaxed text-[var(--forme-type-dim)]">{intro}</p>}
+        <div className="forme-chase mt-8 max-w-md">
+          <div className="forme-bed px-4 py-5 sm:px-6 sm:py-7">{children}</div>
+        </div>
+      </main>
+    </div>
+  );
+}
 
 function AuthContent() {
   const { signIn, signUp, user, resetPasswordForEmail, updatePassword } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+  const [recoveryDone, setRecoveryDone] = useState(false);
   const [tab, setTab] = useState<'signin' | 'signup'>('signin');
 
-  const view = isRecoveryMode ? 'recovery' : showForgotPassword ? 'forgot' : 'main';
-
-  // Entrance animation for the page chrome — runs once per view.
-  useGSAP(
-    () => {
-      const clearProps = 'opacity,transform';
-
-      gsap
-        .timeline({ defaults: { ease: 'power3.out' } })
-        .from('.gsap-back', { opacity: 0, x: -16, duration: 0.5, clearProps })
-        .from('.gsap-card', { opacity: 0, y: 24, duration: 0.6, clearProps }, '-=0.3')
-        .from('.gsap-logo', { opacity: 0, scale: 0.8, duration: 0.5, clearProps }, '-=0.35')
-        .from('.gsap-title', { opacity: 0, y: 12, duration: 0.5, clearProps }, '-=0.3')
-        .from('.gsap-subtitle', { opacity: 0, y: 12, duration: 0.5, clearProps }, '-=0.35');
-    },
-    { scope: containerRef, dependencies: [view] }
-  );
-
-  // Form fields replay whenever the active view or tab changes.
-  useGSAP(
-    () => {
-      const clearProps = 'opacity,transform';
-
-      gsap
-        .timeline({ defaults: { ease: 'power3.out' } })
-        .from('.gsap-field', { opacity: 0, y: 16, duration: 0.4, stagger: 0.08, clearProps })
-        .from('.gsap-submit', { opacity: 0, y: 12, duration: 0.4, clearProps }, '-=0.2');
-    },
-    { scope: containerRef, dependencies: [view, tab] }
-  );
-
-  // Check if this is a password recovery callback
-  useEffect(() => {
-    const type = searchParams.get('type');
-    if (type === 'recovery') {
-      setIsRecoveryMode(true);
-    }
-  }, [searchParams]);
+  // A password recovery callback arrives as ?type=recovery
+  const isRecoveryMode = searchParams.get('type') === 'recovery' && !recoveryDone;
 
   // Redirect if already logged in (unless in recovery mode)
   if (user && !isRecoveryMode) {
@@ -81,8 +111,10 @@ function AuthContent() {
     return null;
   }
 
-  const validate = () => {
-    const newErrors: { email?: string; password?: string } = {};
+  const clear = (key: keyof FieldErrors) => setErrors(prev => ({ ...prev, [key]: undefined }));
+
+  const validate = (needsConfirm = false) => {
+    const newErrors: FieldErrors = {};
 
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
@@ -92,6 +124,10 @@ function AuthContent() {
     const passwordResult = passwordSchema.safeParse(password);
     if (!passwordResult.success) {
       newErrors.password = passwordResult.error.issues[0].message;
+    }
+
+    if (needsConfirm && !newErrors.password && password !== confirmPassword) {
+      newErrors.confirmPassword = 'The two passwords differ. Type the same password in both fields.';
     }
 
     setErrors(newErrors);
@@ -109,7 +145,7 @@ function AuthContent() {
     if (error) {
       toast.error('Sign in failed', {
         description: error.message === 'Invalid login credentials'
-          ? 'Invalid email or password. Please try again.'
+          ? 'That email and password do not match. Check both and try again.'
           : error.message,
       });
     } else {
@@ -119,7 +155,7 @@ function AuthContent() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate(true)) return;
 
     setLoading(true);
     const { error } = await signUp(email, password, displayName);
@@ -128,7 +164,7 @@ function AuthContent() {
     if (error) {
       if (error.message.includes('already registered')) {
         toast.error('Account exists', {
-          description: 'This email is already registered. Please sign in instead.',
+          description: 'This email already has an account. Sign in instead.',
         });
       } else {
         toast.error('Sign up failed', {
@@ -136,8 +172,8 @@ function AuthContent() {
         });
       }
     } else {
-      toast.success('Welcome!', {
-        description: 'Your account has been created successfully.',
+      toast.success('Account created', {
+        description: 'You are signed in.',
       });
       router.push('/');
     }
@@ -162,7 +198,7 @@ function AuthContent() {
       });
     } else {
       toast.success('Check your email', {
-        description: 'We sent you a password reset link. Please check your inbox.',
+        description: 'We sent a reset link. It may take a minute to arrive.',
       });
       setShowForgotPassword(false);
     }
@@ -178,7 +214,7 @@ function AuthContent() {
     }
 
     if (password !== confirmPassword) {
-      setErrors({ confirmPassword: 'Passwords do not match' });
+      setErrors({ confirmPassword: 'The two passwords differ. Type the same password in both fields.' });
       return;
     }
 
@@ -191,10 +227,10 @@ function AuthContent() {
         description: error.message,
       });
     } else {
-      toast.success('Password updated!', {
-        description: 'Your password has been successfully reset.',
+      toast.success('Password updated', {
+        description: 'Your new password is saved.',
       });
-      setIsRecoveryMode(false);
+      setRecoveryDone(true);
       router.push('/');
     }
   };
@@ -202,283 +238,192 @@ function AuthContent() {
   // Recovery mode: show password reset form
   if (isRecoveryMode) {
     return (
-      <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="gsap-card w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="gsap-logo flex justify-center mb-4">
-              <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                <KeyRound className="h-6 w-6" />
-              </div>
-            </div>
-            <CardTitle className="gsap-title text-2xl">Set New Password</CardTitle>
-            <CardDescription className="gsap-subtitle">
-              Enter your new password below
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div className="gsap-field space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors(prev => ({ ...prev, password: undefined }));
-                  }}
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-              <div className="gsap-field space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setErrors(prev => ({ ...prev, confirmPassword: undefined }));
-                  }}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                )}
-              </div>
-              <Button type="submit" className="gsap-submit w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  'Update Password'
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+      <Shell title="Choose a new password">
+        <form onSubmit={handleResetPassword} className="space-y-5" noValidate>
+          <Field
+            id="new-password"
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            error={errors.password}
+            hint="At least 6 characters."
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clear('password');
+            }}
+          />
+          <Field
+            id="confirm-password"
+            label="Confirm new password"
+            type="password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            error={errors.confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              clear('confirmPassword');
+            }}
+          />
+          <Submit loading={loading} idle="Save password" busy="Saving" />
+        </form>
+      </Shell>
     );
   }
 
   // Forgot password view
   if (showForgotPassword) {
     return (
-      <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="gsap-card w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="gsap-logo flex justify-center mb-4">
-              <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                <Mail className="h-6 w-6" />
-              </div>
-            </div>
-            <CardTitle className="gsap-title text-2xl">Reset Password</CardTitle>
-            <CardDescription className="gsap-subtitle">
-              Enter your email and we'll send you a reset link
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div className="gsap-field space-y-2">
-                <Label htmlFor="forgot-email">Email</Label>
-                <Input
-                  id="forgot-email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors(prev => ({ ...prev, email: undefined }));
-                  }}
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
-              <Button type="submit" className="gsap-submit w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  'Send Reset Link'
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="gsap-submit w-full"
-                onClick={() => setShowForgotPassword(false)}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Sign In
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+      <Shell title="Reset your password" intro="Enter your email and we will send you a link to choose a new one.">
+        <form onSubmit={handleForgotPassword} className="space-y-5" noValidate>
+          <Field
+            id="forgot-email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="name@example.com"
+            value={email}
+            error={errors.email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clear('email');
+            }}
+          />
+          <Submit loading={loading} idle="Send reset link" busy="Sending" />
+          <button
+            type="button"
+            className="text-base underline underline-offset-4 hover:text-white"
+            onClick={() => setShowForgotPassword(false)}
+          >
+            Back to sign in
+          </button>
+        </form>
+      </Shell>
     );
   }
 
+  const signingIn = tab === 'signin';
+
   return (
-    <div ref={containerRef} className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-      {/* Back to home button */}
-      <div className="gsap-back w-full max-w-md mb-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/">
-            <Home className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
-        </Button>
+    <Shell
+      title={signingIn ? 'Sign in to your notes' : 'Start your first page'}
+      intro={signingIn ? undefined : 'Create an account to write with the assistant. It takes an email and a password.'}
+    >
+      <div className="mb-6 flex gap-5" role="group" aria-label="Choose sign in or create account">
+        {(['signin', 'signup'] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            aria-pressed={tab === t}
+            onClick={() => {
+              setTab(t);
+              setErrors({});
+            }}
+            className={`pb-1 text-lg font-semibold underline-offset-8 ${
+              tab === t ? 'underline decoration-2' : 'text-[var(--forme-type-dim)] hover:text-white'
+            }`}
+          >
+            {t === 'signin' ? 'Sign in' : 'Create account'}
+          </button>
+        ))}
       </div>
 
-      <Card className="gsap-card w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="gsap-logo flex justify-center mb-4">
-            <Image
-              src="/Notion-black.png"
-              alt="NotionCraft"
-              width={64}
-              height={64}
-              className="h-24 w-24 dark:hidden"
-            />
-            <Image
-              src="/Notion-white.png"
-              alt="NotionCraft"
-              width={64}
-              height={64}
-              className="h-24 w-24 hidden dark:block"
-            />
-          </div>
-          <CardTitle className="gsap-title text-2xl">Welcome to NotionCraft AI</CardTitle>
-          <CardDescription className="gsap-subtitle">
-            Sign in to your account or create a new one
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={tab} onValueChange={(v) => setTab(v as 'signin' | 'signup')} className="w-full">
-            <TabsList className="gsap-field grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="gsap-field space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setErrors(prev => ({ ...prev, email: undefined }));
-                    }}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
-                  )}
-                </div>
-                <div className="gsap-field space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="px-0 h-auto text-sm font-normal text-muted-foreground hover:text-primary"
-                      onClick={() => setShowForgotPassword(true)}
-                    >
-                      Forgot password?
-                    </Button>
-                  </div>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setErrors(prev => ({ ...prev, password: undefined }));
-                    }}
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
-                  )}
-                </div>
-                <Button type="submit" className="gsap-submit w-full" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign In'}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="gsap-field space-y-2">
-                  <Label htmlFor="signup-name">Display Name (optional)</Label>
-                  <Input
-                    id="signup-name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                  />
-                </div>
-                <div className="gsap-field space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setErrors(prev => ({ ...prev, email: undefined }));
-                    }}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
-                  )}
-                </div>
-                <div className="gsap-field space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setErrors(prev => ({ ...prev, password: undefined }));
-                    }}
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
-                  )}
-                </div>
-                <Button type="submit" className="gsap-submit w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Create Account'}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+      {signingIn ? (
+        <form onSubmit={handleSignIn} className="space-y-5" noValidate>
+          <Field
+            id="signin-email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="name@example.com"
+            value={email}
+            error={errors.email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clear('email');
+            }}
+          />
+          <Field
+            id="signin-password"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            error={errors.password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clear('password');
+            }}
+          />
+          <Submit loading={loading} idle="Sign in" busy="Signing in" />
+          <button
+            type="button"
+            className="text-base underline underline-offset-4 hover:text-white"
+            onClick={() => setShowForgotPassword(true)}
+          >
+            Forgot your password?
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleSignUp} className="space-y-5" noValidate>
+          <Field
+            id="signup-name"
+            label="Display name (optional)"
+            type="text"
+            autoComplete="name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+          />
+          <Field
+            id="signup-email"
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="name@example.com"
+            value={email}
+            error={errors.email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clear('email');
+            }}
+          />
+          <Field
+            id="signup-password"
+            label="Password"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            error={errors.password}
+            hint="At least 6 characters."
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clear('password');
+            }}
+          />
+          <Field
+            id="signup-confirm"
+            label="Confirm password"
+            type="password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            error={errors.confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              clear('confirmPassword');
+            }}
+          />
+          <Submit loading={loading} idle="Create account" busy="Creating account" />
+        </form>
+      )}
+    </Shell>
   );
 }
 
 export default function Auth() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className={`forme ${wood.variable} ${grotesk.variable} forme-body flex items-center justify-center`}>
+        <p role="status">Loading</p>
       </div>
     }>
       <AuthContent />

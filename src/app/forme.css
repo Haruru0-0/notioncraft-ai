@@ -91,3 +91,26 @@
     animation: none;
   }
 }
+
+/* Form fields on the forme bed */
+.forme-input {
+  width: 100%;
+  background: var(--forme-bed);
+  color: var(--forme-type);
+  border: 1px solid var(--forme-type-dim);
+  border-radius: 2px;
+  padding: 0.65rem 0.75rem;
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.forme-input::placeholder {
+  color: #9fb0f0;
+}
+
+.forme-input[aria-invalid="true"] {
+  border-width: 2px;
+  border-color: var(--forme-type);
+  padding: calc(0.65rem - 1px) calc(0.75rem - 1px);
+}
