@@ -94,11 +94,15 @@ export function PageHeader({ page, onUpdatePage }: PageHeaderProps) {
           placeholder="Untitled"
         />
       ) : (
-        <h1
-          className="text-4xl font-bold cursor-text hover:bg-muted/50 rounded px-1 -mx-1 transition-colors"
-          onClick={() => setIsEditingTitle(true)}
-        >
-          {page.title || 'Untitled'}
+        <h1 className="text-4xl font-bold">
+          <button
+            type="button"
+            className="w-full text-left cursor-text hover:bg-muted/50 rounded px-1 -mx-1 transition-colors focus-visible:outline-2 focus-visible:outline-ring"
+            aria-label="Rename page"
+            onClick={() => setIsEditingTitle(true)}
+          >
+            {page.title || 'Untitled'}
+          </button>
         </h1>
       )}
       <PageTags pageId={page.id} />

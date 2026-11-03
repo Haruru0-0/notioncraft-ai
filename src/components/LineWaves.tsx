@@ -228,13 +228,15 @@ export default function LineWaves({
       gl.canvas.addEventListener('mouseleave', handleMouseLeave);
     }
 
-    let animationFrameId: number;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let animationFrameId = 0;
 
     function update(time: number) {
-      animationFrameId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = time * 0.001;
+      // Reduced motion: draw one still frame and stop the loop
+      if (!reducedMotion) animationFrameId = requestAnimationFrame(update);
+      program.uniforms.uTime.value = reducedMotion ? 0 : time * 0.001;
 
-      if (enableMouseInteraction) {
+      if (enableMouseInteraction && !reducedMotion) {
         currentMouse[0] += 0.05 * (targetMouse[0] - currentMouse[0]);
         currentMouse[1] += 0.05 * (targetMouse[1] - currentMouse[1]);
         program.uniforms.uMouse.value[0] = currentMouse[0];
@@ -248,8 +250,16 @@ export default function LineWaves({
     }
     animationFrameId = requestAnimationFrame(update);
 
+    // No point drawing while the tab is hidden
+    function handleVisibility() {
+      cancelAnimationFrame(animationFrameId);
+      if (!document.hidden && !reducedMotion) animationFrameId = requestAnimationFrame(update);
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       cancelAnimationFrame(animationFrameId);
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('resize', resize);
       if (enableMouseInteraction) {
         gl.canvas.removeEventListener('mousemove', handleMouseMove);

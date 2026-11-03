@@ -56,6 +56,7 @@ export default function TiltedCard({
 
   function handleMouse(e: React.MouseEvent<HTMLElement>) {
     if (!ref.current) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const rect = ref.current.getBoundingClientRect();
     const offsetX = e.clientX - rect.left - rect.width / 2;

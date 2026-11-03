@@ -166,7 +166,7 @@
 .tiptap p.is-editor-empty::before {
   content: attr(data-placeholder);
   float: left;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
   pointer-events: none;
   height: 0;
 }
@@ -248,7 +248,7 @@
 
 .tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
   text-decoration: line-through;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
 }
 
 .tiptap blockquote {
@@ -257,12 +257,12 @@
   margin-left: 0;
   margin-right: 0;
   font-style: italic;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
 }
 
 /* Code block with syntax highlighting */
 .tiptap pre {
-  background: hsl(var(--muted));
+  background: var(--muted);
   border-radius: var(--radius);
   padding: 1rem;
   overflow-x: auto;
@@ -277,7 +277,7 @@
 }
 
 .tiptap code {
-  background: hsl(var(--muted));
+  background: var(--muted);
   border-radius: 0.25rem;
   padding: 0.125rem 0.25rem;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -437,7 +437,7 @@
 }
 
 .tiptap table .column-resize-handle {
-  background-color: hsl(var(--primary));
+  background-color: var(--primary);
   bottom: -2px;
   position: absolute;
   right: -2px;
@@ -456,7 +456,7 @@
 }
 
 .tiptap a {
-  color: hsl(var(--primary)) !important;
+  color: var(--primary) !important;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -518,7 +518,7 @@
 
 .slash-command-item-description {
   font-size: 0.75rem;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
 }
 
 /* AI inline content styling */
@@ -551,7 +551,7 @@
 }
 
 .tiptap img.ProseMirror-selectednode {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -594,8 +594,7 @@
 
 /* Selection styles */
 .tiptap ::selection {
-  background: var(--primary);
-  opacity: 0.2;
+  background: color-mix(in oklab, var(--primary) 20%, transparent);
 }
 
 /* Block handle styles (Official Tiptap React Drag Handle) */
@@ -629,7 +628,7 @@
 
 /* Selected block styling */
 .tiptap .ProseMirror-selectednode {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: var(--radius);
 }
@@ -670,11 +669,11 @@
 @keyframes dropCursorPulse {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 40%, transparent);
   }
   50% {
     opacity: 0.8;
-    box-shadow: 0 0 8px 2px hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 8px 2px color-mix(in oklab, var(--primary) 30%, transparent);
   }
 }
 
@@ -694,8 +693,8 @@ body.is-dragging::after {
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background: var(--primary);
+  color: var(--primary-foreground);
   padding: 0.75rem 1.5rem;
   border-radius: 2rem;
   font-size: 0.875rem;

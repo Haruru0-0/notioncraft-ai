@@ -28,6 +28,8 @@ const Index = () => {
     () => {
       if (loading) return;
 
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
       gsap
         .timeline({ defaults: { ease: 'power3.out' } })
         .from('.gsap-bg', { opacity: 0, duration: 1.2 })
@@ -43,6 +45,8 @@ const Index = () => {
           { opacity: 0, y: 32, duration: 0.6, stagger: 0.15 },
           '-=0.3'
         );
+      });
+      return () => mm.revert();
     },
     { scope: containerRef, dependencies: [loading] }
   );
@@ -145,7 +149,7 @@ const Index = () => {
           {/* Scroll indicator - positioned between CTA and features */}
           <div className="gsap-scroll flex flex-col items-center gap-2 text-muted-foreground text-sm mb-8 sm:mb-12">
             <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex items-start justify-center p-1">
-              <div className="w-1.5 h-2.5 bg-muted-foreground/50 rounded-full animate-bounce" />
+              <div className="w-1.5 h-2.5 bg-muted-foreground/50 rounded-full motion-safe:animate-bounce" />
             </div>
             <span>Scroll to explore</span>
           </div>
