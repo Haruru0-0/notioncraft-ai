@@ -2,6 +2,21 @@ import type { Editor } from '@tiptap/react';
 
 export type AiEditType = 'improve' | 'shorter' | 'longer' | 'grammar' | 'professional';
 
+/** Thrown when the person has not saved their own AI key yet. The UI offers a way to Profile. */
+export class AiKeyMissingError extends Error {
+  constructor(message = 'Add your Gemini API key in Profile to use the assistant.') {
+    super(message);
+  }
+}
+
+/** Reads the API's error body: a missing or unreadable key, or a signed-out visitor. */
+export async function throwIfKeyProblem(res: Response): Promise<void> {
+  if (res.ok) return;
+  const body = (await res.clone().json().catch(() => null)) as { error?: string; message?: string } | null;
+  if (body?.error === 'API_KEY_MISSING' || body?.error === 'KEY_UNREADABLE') throw new AiKeyMissingError(body.message);
+  if (body?.error === 'UNAUTHENTICATED') throw new Error('Sign in again to use the assistant.');
+}
+
 export const AI_EDIT_ACTIONS: { type: AiEditType; label: string; hint: string }[] = [
   { type: 'improve', label: 'Improve writing', hint: 'Clearer and tighter' },
   { type: 'shorter', label: 'Make shorter', hint: 'Keep the main points' },
@@ -61,6 +76,7 @@ export async function requestAiEdit(editor: Editor, type: AiEditType): Promise<v
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: original, type }),
   });
+  await throwIfKeyProblem(res);
   if (!res.ok) {
     throw new Error(res.status === 429 ? 'The assistant is busy. Try again in a minute.' : 'The assistant could not answer. Try again.');
   }

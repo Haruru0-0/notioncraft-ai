@@ -107,3 +107,6 @@ If you just want a single `.sql` file with the schema:
    from information_schema.columns 
    where table_schema = 'public';
    ```
+
+-- Each person's own Gemini key, stored encrypted. Full SQL with row security: supabase/migrations/20261105000000_ai_keys.sql
+-- CREATE TABLE public.ai_keys (user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, provider text NOT NULL DEFAULT 'gemini', encrypted_key text NOT NULL, key_hint text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());

@@ -36,7 +36,7 @@ import { FontSize } from './extensions/FontSizeExtension';
 import { LinkDialog } from './modals/LinkDialog';
 import { AiSuggestion } from './extensions/AiSuggestionExtension';
 import { AiSuggestionBar } from './AiSuggestionBar';
-import { requestAiEdit, type AiEditType } from '@/lib/ai-edit';
+import { requestAiEdit, AiKeyMissingError, type AiEditType } from '@/lib/ai-edit';
 import { toast } from 'sonner';
 
 const lowlight = createLowlight(common);
@@ -178,6 +178,13 @@ export const NotionEditor = forwardRef<any, NotionEditorProps>(({ content, onUpd
     try {
       await requestAiEdit(editor, type);
     } catch (error) {
+      if (error instanceof AiKeyMissingError) {
+        toast.error('Add your AI key', {
+          description: error.message,
+          action: { label: 'Open Profile', onClick: () => window.open('/workspace/profile#ai-key', '_blank') },
+        });
+        return;
+      }
       toast.error('Assistant', { description: error instanceof Error ? error.message : 'Something went wrong. Try again.' });
     } finally {
       setAiBusy(false);

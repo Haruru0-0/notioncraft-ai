@@ -12,3 +12,7 @@ See [[architecture]] for the pieces involved.
 - **Graphify skips `.sql` files** until `pip install "graphifyy[sql]"` (tree_sitter_sql), and does not read the CSS files.
 - **Dummy values are enough to render the landing and auth screens,** but the workspace needs a real login.
 - **Old editor files carry many lint errors** (`any`, effects that set state). New code is lint-clean; the old ones were left alone.
+- **The assistant needs `KEY_ENCRYPTION_SECRET` and the `ai_keys` table.** Without the secret, saving a key answers 503 and the Profile card says so. Run `supabase/migrations/20261105000000_ai_keys.sql` in the Supabase SQL editor of every project (not yet run on the live one). Changing the secret makes saved keys unreadable (`KEY_UNREADABLE`); people add them again.
+- **Set `KEY_ENCRYPTION_SECRET` in Vercel and remove `GOOGLE_GENERATIVE_AI_API_KEY` there** if you want everyone to use their own key; while that variable exists it is a shared fallback and its owner pays for it.
+- **The AI routes read the session from the request cookie** (`supabaseForRequest`) and never refresh it; the proxy does that on page loads. A very old tab can get 401 until the page is reloaded.
+- **Tested here without a real Supabase** (`.env.local` holds dummy values): the encryption round trip, tamper and wrong-secret refusal, the Google check against a fake key, signed-out 401 on all AI routes, and a production build. The signed-in paths (saving, decrypting, a real answer) are untested.

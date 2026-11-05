@@ -1,10 +1,12 @@
 import { streamText } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { AiKeyError, aiKeyErrorResponse, resolveGeminiKey } from "@/lib/ai-key";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
     try {
+        const google = createGoogleGenerativeAI({ apiKey: await resolveGeminiKey(req) });
         const { prompt, type } = await req.json();
 
         let systemPrompt = "";
@@ -39,6 +41,7 @@ export async function POST(req: Request) {
 
         return result.toTextStreamResponse();
     } catch (error) {
+        if (error instanceof AiKeyError) return aiKeyErrorResponse(error);
         console.error("Writer API error:", error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,

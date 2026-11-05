@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { AiKeySection } from '@/components/profile/AiKeySection';
 import { ChevronLeft, Loader2, Save, Mail, User as UserIcon, ShieldCheck, KeyRound, Eye, EyeOff, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -258,6 +259,9 @@ export default function ProfilePage() {
                         </Button>
                     </div>
                 </form>
+
+                {/* AI key: each person uses their own Gemini key */}
+                <AiKeySection />
 
                 {/* Password Change Section */}
                 <form onSubmit={handlePasswordChange} className="space-y-10">

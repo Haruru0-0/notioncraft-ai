@@ -38,3 +38,13 @@ export const pageTags = pgTable('page_tags', {
 }, (t) => ({
     pk: primaryKey({ columns: [t.pageId, t.tagId] }),
 }));
+
+// Each person's own AI key, stored encrypted (src/lib/ai-key-crypto.ts). Created by supabase/migrations/20261105000000_ai_keys.sql
+export const aiKeys = pgTable('ai_keys', {
+    userId: uuid('user_id').primaryKey(),
+    provider: text('provider').default('gemini').notNull(),
+    encryptedKey: text('encrypted_key').notNull(),
+    keyHint: text('key_hint').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});

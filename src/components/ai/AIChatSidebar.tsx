@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useAiKey } from '@/hooks/useAiKey';
+import { AiKeyMissingError, throwIfKeyProblem } from '@/lib/ai-edit';
+import Link from 'next/link';
 import {
   Drawer,
   DrawerContent,
@@ -30,6 +33,7 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const { needsKey, refresh: refreshKey } = useAiKey();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -57,6 +61,7 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
         }),
       });
 
+      await throwIfKeyProblem(response);
       if (!response.ok) {
         if (response.status === 429) {
           throw new Error('Rate limit exceeded. Please try again later.');
@@ -91,6 +96,7 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
         }
       }
     } catch (error: any) {
+      if (error instanceof AiKeyMissingError) void refreshKey();
       console.error('AI chat error:', error);
       setMessages(prev => [
         ...prev,
@@ -173,6 +179,15 @@ export function AIChatSidebar({ isOpen, onClose, onInsertContent }: AIChatSideba
           </div>
         )}
       </ScrollArea>
+
+      {needsKey && (
+        <div className="flex-none border-t bg-muted/40 px-4 py-3 text-sm">
+          <p className="text-muted-foreground">The assistant needs your own Gemini key.</p>
+          <Link href="/workspace/profile#ai-key" className="font-medium underline underline-offset-2">
+            Add your key in Profile
+          </Link>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex-none p-4 border-t bg-background sticky bottom-0 z-10">
         <div className="flex gap-2">
