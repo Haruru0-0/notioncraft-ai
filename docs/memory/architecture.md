@@ -23,4 +23,4 @@ Tables: `ai_keys` (one encrypted Gemini key per user), `profiles`, `pages` (soft
 - In-page edit: `BubbleToolbar` Assistant menu, then `requestAiEdit` posts `{prompt, type}` to `/api/ai/writer` (types: improve, shorter, longer, grammar, professional). The reply replaces the selection as an `aiSuggestion` mark (`data-ai-id`, `data-ai-original`) until accepted or rejected.
 
 ## Deployment
-Vercel (live demo notioncraft-ai.vercel.app). GitHub Actions mirrors every push and nightly to a private GitLab copy (`mirror-to-gitlab.yml`).
+Vercel (live demo notioncraft-ai.vercel.app). GitHub Actions mirrors every push and nightly to a private GitLab copy (`mirror-to-gitlab.yml`), and `keep-supabase-awake.yml` reads one row from Supabase every three days so the free project is not paused for inactivity (needs the repo secrets `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`).
