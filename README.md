@@ -2,7 +2,7 @@
 
 An intelligent note-taking and document management application that combines the power of AI with a rich text editing experience. Build, organize, and enhance your documents with AI-powered features.
 
-**🌐 Live Demo:** [notioncraft-ai.vercel.app](https://notioncraft-ai.vercel.app)
+**🌐 Live Demo:** [notioncraft-ai-silk.vercel.app](https://notioncraft-ai-silk.vercel.app)
 
 ---
 
@@ -67,7 +67,7 @@ An intelligent note-taking and document management application that combines the
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/AhmadKanaan0/notioncraft-ai.git
+   git clone https://github.com/Haruru0-0/notioncraft-ai.git
    cd notioncraft-ai
    ```
 
@@ -227,7 +227,7 @@ This project is private. All rights reserved to Ahmad Kanaan.
 ## 📞 Support
 
 For issues, questions, or suggestions:
-- Open an [issue](https://github.com/AhmadKanaan0/notioncraft-ai/issues)
+- Open an [issue](https://github.com/Haruru0-0/notioncraft-ai/issues)
 - Check existing documentation in [SUPABASE_SCHEMA.md](./SUPABASE_SCHEMA.md)
 
 ---
