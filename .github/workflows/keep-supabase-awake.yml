@@ -35,3 +35,19 @@ jobs:
           echo "Supabase answered HTTP $status"
           # 200 is the normal answer. A paused project answers 5xx or times out, which fails this run and emails you.
           [ "$status" = "200" ]
+
+      # A read through the REST API with the public key did not stop a pause on 2026-11-19 (pings answered 200 up to
+      # 2026-11-16). A real database query is the activity that surely counts, so this step runs one.
+      # SUPABASE_DB_URL must be the Supavisor SESSION POOLER string (Project Settings > Database > Connection string),
+      # not the direct db.<ref>.supabase.co host: GitHub runners have no IPv6 and the direct host is IPv6-only.
+      - name: Run one query on the database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGCONNECT_TIMEOUT: '30'
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "Add the SUPABASE_DB_URL repository secret (the session pooler connection string)."
+            exit 1
+          fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 --no-psqlrc -tAc 'select 1' > /dev/null
+          echo "Database answered the query"
